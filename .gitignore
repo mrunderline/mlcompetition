@@ -1,0 +1,6 @@
+.idea
+venv
+.env
+mlcompetition.sqlite
+
+*/**/__pycache__
