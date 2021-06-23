@@ -15,12 +15,12 @@ pre_define_db()
 
 def fetch_leader_board(db: Database, competition_id):
     db.query(f"""
-        select * from leader_board where competition_id = {competition_id} order by score, created_at;
+        select * from leader_board where competition_id = {competition_id} order by error, send_at;
     """)
     result = db.fetchall()
 
     return [
-        dict(zip(Database.leader_board_cols, res)) for res in result
+        {'rank': i + 1} | dict(zip(Database.leader_board_cols, res)) for i, res in enumerate(result)
     ]
 
 
@@ -168,26 +168,36 @@ def send_answer(_id):
     df_evaluation = pd.read_csv(competition.get('evaluation_file_path'))
     df_final = pd.merge(df_evaluation, df_answer, on='id', how='left')
 
-    score = evaluator(df_final['value'], df_final['answer'])
+    error = evaluator(df_final['value'], df_final['answer'])
 
     db.query(f"""
-        insert into leader_board(competition_id, name, score)
-            values({competition.get('id')}, '{body.get('name')}', {score});
+        insert into leader_board(competition_id, name, error)
+            values({competition.get('id')}, '{body.get('name')}', {error});
     """)
     db.commit()
 
-    data = fetch_leader_board(db, competition['id'])
+    db.query(f"""
+        select count(*) from leader_board where error <= {error};
+    """)
+    rank = db.fetchone()
+
+    leader_board = fetch_leader_board(db, competition['id'])
 
     return jsonify(
         success=True,
         message='competition created successfully',
-        data=data
+        data={
+            'error': error,
+            'rank': rank[0],
+            'all_participants': len(leader_board),
+            'leader_board': leader_board
+        }
     )
 
 
 # to retrieve leader board
 @app.route('/leader_board/<int:competition_id>')
-def leader_board(competition_id):
+def retrieve_leader_board(competition_id):
     db = Database()
     return jsonify(
         success=True,

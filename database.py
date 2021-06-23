@@ -5,7 +5,7 @@ from setting import *
 class Database:
     instance = None
     competition_cols = ['id', 'title', 'evaluator', 'evaluation_file_path', 'created_at']
-    leader_board_cols = ['id', 'competition_id', 'name', 'score', 'created_at']
+    leader_board_cols = ['id', 'competition_id', 'name', 'error', 'send_at']
 
     # def __new__(cls, *args, **kwargs):
     #     if cls.instance is None:
@@ -64,8 +64,8 @@ def pre_define_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             competition_id INTEGER,
             name TEXT,
-            score REAL,
-            created_at DATE DEFAULT CURRENT_TIMESTAMP
+            error REAL,
+            send_at DATE DEFAULT CURRENT_TIMESTAMP
         );
     """)
 
