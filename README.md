@@ -5,8 +5,13 @@
 2. also answers file should have `id` and `answer` columns.
 3. `request_doc.json` is a simple export file from [insomnia](https://insomnia.rest/).
 
-# how to run?
+## how to run?
 * create a virtualenv
 * install dependencies
 * make a copy from `.env.sample` to `.env` and fill variables
 * execute `flask run`
+
+## Todo
+- [ ] add front-end
+- [ ] convert `sqlite` dbms to `postgres`
+- [ ] add other evaluation functions
